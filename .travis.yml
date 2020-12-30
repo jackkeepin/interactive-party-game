@@ -5,3 +5,5 @@ nodejs:
 
 install:
   - npm install express
+  - npm install -g mocha
+  - npm install chai
