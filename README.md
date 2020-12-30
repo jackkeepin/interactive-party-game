@@ -1,1 +1,1 @@
-"# interactive-party-game" 
+# interactive-party-game
