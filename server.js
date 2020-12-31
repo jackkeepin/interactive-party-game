@@ -7,18 +7,37 @@ const port = process.env.PORT || 9000;
 
 
 let app = express();
-let server = http.createServer(app);
+// let server = http.createServer(app);
 
-app.use(express.static(path.join(__dirname, "resources")));
+//Setup app to use EJS templates
+app.set("views", path.join(__dirname, "resources/views"));
+app.set("view engine", "ejs");
 
-server.listen(port, function() {
-    console.log("Server listening on port " + port);
+//Set up static files
+app.use(express.static(path.join(__dirname, "resources/static")));
+
+
+app.get("/", function(request, response) {
+    response.render("index");
 });
 
-let io = socketio(server);
+app.get("/new-game", function(request, response) {
+    response.render("new_game");
+})
 
-io.sockets.on("connection", function(socket) {
-    socket.on("create", function(room) {
-        socket.join(room);
-    });
+app.get("/hello", function(request, response) {
+    response.send("it worked oh yeah");
 });
+
+app.listen(port, function() {
+    console.log("Listening on port " + port);
+});
+
+
+// let io = socketio(server);
+
+// io.sockets.on("connection", function(socket) {
+//     socket.on("create", function(room) {
+//         socket.join(room);
+//     });
+// });

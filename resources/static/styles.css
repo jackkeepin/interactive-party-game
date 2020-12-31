@@ -31,7 +31,8 @@ body {
   text-align: center;
 }
 
-#newGameButton {
+#newGameButton,
+#startGameButton {
   font-size: x-large;
   border-radius: 5%;
   transition: all 0.2s;
@@ -40,7 +41,8 @@ body {
   border: 1px solid #b5838d;
 }
 
-#newGameButton:hover {
+#newGameButton:hover,
+#startGameButton:hover {
   background-color: #b5838d;
   cursor: pointer;
   box-shadow: none;

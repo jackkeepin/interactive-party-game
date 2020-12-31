@@ -6,7 +6,8 @@
         <link rel="stylesheet" href="styles.css">
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-        <script src="scripts.js"></script>
+        <!-- <script src="/resources/logic/index_scripts.js"></script> -->
+        <!-- <script src="/scripts.js"></script> -->
     </head>
 
     <body>
@@ -18,6 +19,7 @@
             <h1 id="newGameTitle">Click here to create a new game!</h1>
             <button id="newGameButton">New game</button>
         </div>
+        
 
         <div class="centered enterDetailsBox">
             <!-- <label for="gameCode">Enter game code</label> -->
@@ -27,4 +29,13 @@
         </div>
 
     </body>
+
 </html>
+
+<script>
+    $("#newGameButton").click(function() {
+        console.log("clicked");
+        location.href = "/new-game";
+        
+    });
+</script>
