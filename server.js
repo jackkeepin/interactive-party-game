@@ -10,11 +10,11 @@ let app = express();
 // let server = http.createServer(app);
 
 //Setup app to use EJS templates
-app.set("views", path.join(__dirname, "resources/views"));
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 //Set up static files
-app.use(express.static(path.join(__dirname, "resources/static")));
+app.use(express.static(path.join(__dirname, "static")));
 
 
 app.get("/", function(request, response) {
