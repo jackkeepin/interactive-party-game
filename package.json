@@ -9,7 +9,8 @@
     "express": "^4.17.1",
     "mocha": "^8.2.1",
     "mongoose": "^5.11.8",
-    "socket.io": "^3.0.4"
+    "socket.io": "^3.0.4",
+    "socket.io-client": "^3.0.4"
   },
   "devDependencies": {},
   "scripts": {

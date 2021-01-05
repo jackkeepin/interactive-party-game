@@ -7,3 +7,6 @@ install:
   - npm install express
   - npm install -g mocha
   - npm install chai
+  - npm install socket.io
+  - npm install ejs
+  - npm install path
