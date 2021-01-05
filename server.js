@@ -33,6 +33,7 @@ io.on("connection", function(socket) {
 
     socket.on("create room", function(gameCode) {
         socket.join(gameCode);
+        
         //temp username for development
         socket.username = "this the username";
         let socketId = socket.id;
