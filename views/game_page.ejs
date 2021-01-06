@@ -8,8 +8,7 @@
         <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         
-        <script type="module" src="/scripts/sockets.js"></script>
-        <script type="module" src="/scripts/new_game_scripts.js"></script>
+        <script type="module" src="/scripts/game_page_sockets.js"></script>
 
     </head>
 
@@ -30,7 +29,10 @@
 
             <div class="displayPlayersBox">
                 <br><br>
-                <p>Players' nicknames to be displayed here</p>
+                <div id="playersList">
+                    <!-- <p id="displayPlayer">Name here</p> -->
+                </div>
+                <!-- <p id="players">Players' nicknames to be displayed here</p> -->
             </div>
 
             <button id="startGameButton">Start game</button>

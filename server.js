@@ -23,15 +23,15 @@ app.get("/", function(request, response) {
     response.render("index");
 });
 
-app.get("/new-game", function(request, response) {
-    response.render("new_game");
+app.get("/game-page", function(request, response) {
+    response.render("game_page");
 })
 
 var users = {};
 io.on("connection", function(socket) {
     socket.emit("confirm connection", "successfully connected - from server");
 
-    socket.on("create room", function(gameCode) {
+    socket.on("join room", function(gameCode) {
         socket.join(gameCode);
         console.log("joined")
         console.log(socket.id)
@@ -44,11 +44,11 @@ io.on("connection", function(socket) {
             users[gameCode] = {};
         }
         
-        //add socket id and empty username because it has not been set to users dict
+        //add socket id and empty username (because it has not been set) to users dict
         users[gameCode][socketId] = "";
         
         //send back users, but only clients in the same room
-        io.to(gameCode).emit("users dict test", users[gameCode]);
+        io.to(gameCode).emit("return users dict", users[gameCode]);
     });
 
     socket.on("set nickname", function(data) {
@@ -61,23 +61,10 @@ io.on("connection", function(socket) {
         //assign nickname to socket and update users dict
         socket.username = nickname;
         users[gameCode][socket.id] = socket.username;
-        io.to(gameCode).emit("users dict test", users[gameCode]);
+        io.to(gameCode).emit("return users dict", users[gameCode]);
 
     });
 
-    socket.on("join game", function(data) {
-        console.log("join game event now");
-        console.log(socket.id);
-        console.log(data);
-        let gameCode = data[0];
-        let nickname = data[1];
-
-        //Socket joins room and add details to users dict
-        socket.join(gameCode);
-        socket.username = nickname;
-        users[gameCode][socket.id] = socket.username;
-        io.to(gameCode).emit("users dict test", users[gameCode]);
-    });
 });
 
 

@@ -18,6 +18,7 @@ body {
 
 #joinGameTitle {
   margin: 0;
+  margin-top: 5%;
 }
 
 .centeredNew {
@@ -54,7 +55,7 @@ body {
   background-color: #e5989b;
   box-shadow: -3px 3px #b5838d, -2px 2px #b5838d, -1px 1px #b5838d;
   border: 1px solid #b5838d;
-  margin-top: 3%;
+  /* margin-top: 3%; */
 }
 
 #newGameButton:hover,
@@ -86,6 +87,11 @@ body {
   color: #000000;
   font-weight: 900;
   margin-top: 5%;
+  margin-bottom: 3%;
+}
+
+#nicknameIndexInput {
+  margin-bottom: 3%;
 }
 
 #nicknameInput {
@@ -101,4 +107,15 @@ body {
   border-radius: 5%;
   background-color: #f7564a;
   width: fit-content;
+}
+
+#displayPlayer {
+  max-width: fit-content;
+  display: inline;
+  border: 1px solid #b5838d;
+  background-color: #e5989b;
+  padding: 1%;
+  margin: 20px;
+  border-radius: 5%;
+  color: black;
 }
