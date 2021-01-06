@@ -4,8 +4,8 @@ import "https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"
 $(function() {
     
     console.log('good start')
-    // let socket = io();
-    let socket = io("http://localhost:9000");
+    let socket = io();
+    // let socket = io("http://localhost:9000");
 
     let gameCode = localStorage.getItem("gameCode");
     console.log('game code below from local storage')
