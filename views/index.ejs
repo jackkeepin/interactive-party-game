@@ -8,6 +8,7 @@
         <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
         <!-- <script src="/socket.io/socket.io.js"></script> -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script type="module" src="/scripts/sockets.js"></script>
         <script src="/scripts/index_scripts.js"></script>
     </head>
 
@@ -16,17 +17,20 @@
             <p id="title">Another interactive party game</p>
         </div>
 
-        <div class="centeredTop">
+        <div class="centeredNew">
             <h1 id="newGameTitle">Click here to create a new game!</h1>
-            <button id="newGameButton">New game</button>
+            <button id="newGameButton">New game</button><br><br>
         </div>
         
 
-        <div class="centered enterDetailsBox">
-            <!-- <label for="gameCode">Enter game code</label> -->
-            <input type="text" class="gameInputs" id="gameCode" placeholder="Enter game code"><br>
+        <div class="centeredNew enterDetailsBox">
+            <h1 id="joinGameTitle">Enter details to join a game!</h1>
 
-            <input type="text" class="gameInputs" id="nickname" placeholder="Enter your nickname">
+            <input type="text" maxlength="4" class="gameInputs" id="gameCode" placeholder="Enter game code"><br>
+
+            <input type="text" maxlength="10" class="gameInputs" id="nickname" placeholder="Enter your nickname"><br>
+
+            <button id="joinGameButton">Join game</button>
         </div>
 
     </body>

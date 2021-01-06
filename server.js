@@ -33,11 +33,10 @@ io.on("connection", function(socket) {
 
     socket.on("create room", function(gameCode) {
         socket.join(gameCode);
-        
-        //temp username for development
-        socket.username = "this the username";
+        console.log("joined")
+        console.log(socket.id)
+;
         let socketId = socket.id;
-        let socketUsername = socket.username;
 
         //if the room is newly created add an empty dict as a value to the gameCode key
         let isRoomExist = (gameCode in users);
@@ -45,10 +44,38 @@ io.on("connection", function(socket) {
             users[gameCode] = {};
         }
         
-        //add socket id and associated username to users dict
-        users[gameCode][socketId] = socketUsername;
+        //add socket id and empty username because it has not been set to users dict
+        users[gameCode][socketId] = "";
         
         //send back users, but only clients in the same room
+        io.to(gameCode).emit("users dict test", users[gameCode]);
+    });
+
+    socket.on("set nickname", function(data) {
+        console.log("socket.id below on 'set nickname' event");
+        console.log(socket.id);
+        console.log(data);
+        let gameCode = data[0];
+        let nickname = data[1];
+
+        //assign nickname to socket and update users dict
+        socket.username = nickname;
+        users[gameCode][socket.id] = socket.username;
+        io.to(gameCode).emit("users dict test", users[gameCode]);
+
+    });
+
+    socket.on("join game", function(data) {
+        console.log("join game event now");
+        console.log(socket.id);
+        console.log(data);
+        let gameCode = data[0];
+        let nickname = data[1];
+
+        //Socket joins room and add details to users dict
+        socket.join(gameCode);
+        socket.username = nickname;
+        users[gameCode][socket.id] = socket.username;
         io.to(gameCode).emit("users dict test", users[gameCode]);
     });
 });

@@ -16,33 +16,51 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+#joinGameTitle {
+  margin: 0;
+}
+
+.centeredNew {
+  margin: auto;
+  text-align: center;
+}
+
 .centered {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -25%);
 }
 
 .centeredTop {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -225%);
+  transform: translate(-50%, -180%);
   text-align: center;
 }
 
+#warningLabel {
+  display: block;
+}
+
 #newGameButton,
-#startGameButton {
+#startGameButton,
+#joinGameButton,
+#nicknameButton {
   font-size: x-large;
   border-radius: 5%;
   transition: all 0.2s;
   background-color: #e5989b;
   box-shadow: -3px 3px #b5838d, -2px 2px #b5838d, -1px 1px #b5838d;
   border: 1px solid #b5838d;
+  margin-top: 3%;
 }
 
 #newGameButton:hover,
-#startGameButton:hover {
+#startGameButton:hover,
+#joinGameButton:hover,
+#nicknameButton:hover {
   background-color: #b5838d;
   cursor: pointer;
   box-shadow: none;
@@ -64,7 +82,23 @@ body {
 
 .gameInputs {
   font-size: x-large;
-  color: #e5989b;
+  /* color: #e5989b; */
+  color: #000000;
   font-weight: 900;
   margin-top: 5%;
+}
+
+#nicknameInput {
+  margin-top: 0%;
+  font-size: x-large;
+  color: #000000;
+  font-weight: 900;
+}
+
+#nicknameWarning {
+  font-size: x-large;
+  border: 1px solid #f7564a;
+  border-radius: 5%;
+  background-color: #f7564a;
+  width: fit-content;
 }
