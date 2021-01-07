@@ -34,8 +34,7 @@ io.on("connection", function(socket) {
     socket.on("join room", function(gameCode) {
         socket.join(gameCode);
         console.log("joined")
-        console.log(socket.id)
-;
+        console.log(socket.id);
         let socketId = socket.id;
 
         //if the room is newly created add an empty dict as a value to the gameCode key
@@ -64,6 +63,19 @@ io.on("connection", function(socket) {
         io.to(gameCode).emit("return users dict", users[gameCode]);
 
     });
+
+    socket.on("disconnecting", function(data) {
+        //when a user disconnects from a game, remove from users dict
+        let rooms = socket.rooms;
+        rooms = rooms.values();
+        let socketId = rooms.next().value;
+        let gameCode = rooms.next().value;
+
+        delete users[gameCode][socketId];
+
+        io.to(gameCode).emit("return users dict", users[gameCode]);
+    });
+
 
 });
 

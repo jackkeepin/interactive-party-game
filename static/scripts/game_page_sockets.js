@@ -40,6 +40,7 @@ $(function() {
             }
            
         }
+        $("#connectedPlayers").text("Connected players: " + players.length + "/6")
         console.log(players);
     });
 
