@@ -28,6 +28,13 @@ $(function() {
         }
     });
 
+    socket.on("room full warning", function(data) {
+        //display warning and redirect back to previous page
+        console.log("room full warning received game_page_sockets file");
+        alert("Sorry,the room is already full. You will now be redirected back to the home page.")
+        location.href = "/";
+    });
+
     socket.on("return users dict", function(data) {
         console.log("recieved users dict from server, look below");
         console.log(data);
