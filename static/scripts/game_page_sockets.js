@@ -7,11 +7,15 @@ $(function() {
     let socket = io();
     // let socket = io("http://localhost:9000");
 
-    let gameCode = localStorage.getItem("gameCode");
+    let gameCode = sessionStorage.getItem("gameCode");
+    let gameCreator = sessionStorage.getItem("gameCreator");
     console.log('game code below from local storage')
     console.log(gameCode)
 
-    socket.emit("join room", gameCode);
+    console.log("socketid cleint side below")
+    console.log(socket.id);
+
+    socket.emit("join room", [gameCode, gameCreator]);
 
     $("#gameCodeTitle").text("Game code: " + gameCode);
 
@@ -28,10 +32,17 @@ $(function() {
         }
     });
 
+    socket.on("invalid game code", function(data) {
+        //display warning saying invalid game code and redirect to home
+        console.log("invalid game gode warning received");
+        alert("Sorry, that is an invalid game code. You will now be redirected back to the home page.");
+        location.href = "/";
+    });
+
     socket.on("room full warning", function(data) {
-        //display warning and redirect back to previous page
+        //display warning and redirect back to home
         console.log("room full warning received game_page_sockets file");
-        alert("Sorry,the room is already full. You will now be redirected back to the home page.")
+        alert("Sorry,the room is already full. You will now be redirected back to the home page.");
         location.href = "/";
     });
 

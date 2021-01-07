@@ -31,14 +31,24 @@ var users = {};
 io.on("connection", function(socket) {
     socket.emit("confirm connection", "successfully connected - from server");
 
-    socket.on("join room", function(gameCode) {
+    socket.on("join room", function(data) {
+        let gameCode = data[0];
+        let gameCreator = data[1];
+
         socket.join(gameCode);
         let socketId = socket.id;
 
         //if the room is newly created add an empty dict as a value to the gameCode key
         let isRoomExist = (gameCode in users);
-        if (isRoomExist == false) {
+        
+        //if client clicked new game
+        if (isRoomExist == false && gameCreator == "true") {
             users[gameCode] = {};
+        }
+        //if client trying to join room that doesn't exist
+        else if (isRoomExist == false && gameCreator == "false") {
+            io.to(socketId).emit("invalid game code", "The game code is incorrect");
+            return;
         }
         
         //add socket id and empty username (because it has not been set) to users dict
@@ -77,18 +87,24 @@ io.on("connection", function(socket) {
         let socketId = rooms.next().value;
         let gameCode = rooms.next().value;
 
+        let isRoomExist = (gameCode in users);
+
         //remove socket from users dict and socketio room
-        if (socketId in users[gameCode]){
-            delete users[gameCode][socketId];
-            socket.leave(gameCode);
+        if (isRoomExist == true) {
+            if (socketId in users[gameCode]){
+                delete users[gameCode][socketId];
+                socket.leave(gameCode);
+            }
         }
-
+       
         //If all users leave a room, remove room from users dict
-        let usersInRoom = (Object.keys(users[gameCode])).length;
-        if (usersInRoom == 0) {
-            delete users[gameCode];
+        if (isRoomExist == true) {
+            let usersInRoom = (Object.keys(users[gameCode])).length;
+            if (usersInRoom == 0) {
+                delete users[gameCode];
+            }
         }
-
+        
         io.to(gameCode).emit("return users dict", users[gameCode]);
     });
 
