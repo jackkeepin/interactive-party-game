@@ -9,6 +9,11 @@ $(function() {
 
     let gameCode = sessionStorage.getItem("gameCode");
     let gameCreator = sessionStorage.getItem("gameCreator");
+
+    if (gameCreator == "true") {
+        $("#startGameButtonDiv").append("<button id='startGameButton'>Start game</button>");
+    }
+
     console.log('game code below from local storage')
     console.log(gameCode)
 
