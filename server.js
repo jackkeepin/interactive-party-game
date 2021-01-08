@@ -45,6 +45,19 @@ io.on("connection", function(socket) {
         if (isRoomExist == false && gameCreator == "true") {
             users[gameCode] = {};
         }
+        //if new game has been created and random code is already in use for another room
+        else if(isRoomExist == true && gameCreator == "true") {
+            socket.leave(gameCode);
+            while (isRoomExist == true) {
+                gameCode = parseInt(Math.floor(1000 + Math.random() * 9000));
+                gameCode = gameCode.toString();
+                isRoomExist = (gameCode in users);
+            }
+            socket.join(gameCode);
+            io.to(socketId).emit("new game code", gameCode);
+            
+            users[gameCode] = {};
+        }
         //if client trying to join room that doesn't exist
         else if (isRoomExist == false && gameCreator == "false") {
             io.to(socketId).emit("invalid game code", "The game code is incorrect");
@@ -76,8 +89,8 @@ io.on("connection", function(socket) {
         //assign nickname to socket and update users dict
         socket.username = nickname;
         users[gameCode][socket.id] = socket.username;
-        io.to(gameCode).emit("return users dict", users[gameCode]);
 
+        io.to(gameCode).emit("return users dict", users[gameCode]);
     });
 
     socket.on("disconnecting", function(data) {

@@ -3,7 +3,6 @@ import "https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"
 
 $(function() {
     
-    console.log('good start')
     let socket = io();
     // let socket = io("http://localhost:9000");
 
@@ -28,13 +27,19 @@ $(function() {
     $("#nicknameButton").click(function() {
         let nickname = $("#nicknameInput").val();
         if (nickname.length > 10 || nickname.length <= 0) {
-            console.log("thats a nickname error");
             $("#nicknameWarning").css("display", "inline-block");
         }
         else {
             $("#nicknameWarning").css("display", "");
             socket.emit("set nickname", [gameCode, nickname]);
         }
+    });
+
+    socket.on("new game code", function(data) {
+        //update room code in session storage if room code already in use on server
+        sessionStorage.setItem("gameCode", data);
+        gameCode = sessionStorage.getItem("gameCode");
+        $("#gameCodeTitle").text("Game code: " + gameCode);
     });
 
     socket.on("invalid game code", function(data) {
@@ -47,7 +52,7 @@ $(function() {
     socket.on("room full warning", function(data) {
         //display warning and redirect back to home
         console.log("room full warning received game_page_sockets file");
-        alert("Sorry,the room is already full. You will now be redirected back to the home page.");
+        alert("Sorry, the room is already full. You will now be redirected back to the home page.");
         location.href = "/";
     });
 
