@@ -74,8 +74,8 @@ io.on("connection", function(socket) {
         users[gameCode][socketId] = "";
 
         //If the user that just joined results in too many players joining the room, remove from users dict and return warning
-        let usersInRoom = (Object.keys(users[gameCode])).length;
-        if (usersInRoom >=7) {
+        let numUsersInRoom = (Object.keys(users[gameCode])).length;
+        if (numUsersInRoom >=7) {
             console.log("room at max capacity")
             delete users[gameCode][socketId];
             io.to(socketId).emit("room full warning", "The room is already full");
@@ -112,6 +112,37 @@ io.on("connection", function(socket) {
             });
     });
 
+    socket.on("validate game", function(data) {
+        let gameCode = data[0];
+        let category = data[1];
+
+        //check there are at least 3 players in game
+        let numUsersInRoom = (Object.keys(users[gameCode])).length;
+        if(numUsersInRoom <= 2) {
+            io.to(socket.id).emit("validate game error", "There must be at least three players in the game to start!");
+            return;
+        }
+
+        //check a cetegory has been selected
+        if (category == null) {
+            io.to(socket.id).emit("validate game error", "A category must be selected!");
+            return;
+        }
+
+        //Check all clients have submitted a username
+        for (key in users[gameCode]) {
+            if (users[gameCode][key] == "") {
+                //send error to client that started game and client without nickname
+                io.to(socket.id).emit("validate game error", "All players must enter a nickname!");
+                io.to(key).emit("validate game error", "You must enter a nickname!")
+                return;
+            }
+        }
+
+        //need to return which client is VIP, maybe do that on different socket event
+        io.to(gameCode).emit("start game");
+    });
+
     socket.on("disconnecting", function(data) {
         //when a user disconnects from a game, remove from users dict
         let rooms = socket.rooms;
@@ -131,8 +162,8 @@ io.on("connection", function(socket) {
        
         //If all users leave a room, remove room from users dict
         if (isRoomExist == true) {
-            let usersInRoom = (Object.keys(users[gameCode])).length;
-            if (usersInRoom == 0) {
+            let numUsersInRoom = (Object.keys(users[gameCode])).length;
+            if (numUsersInRoom == 0) {
                 delete users[gameCode];
             }
         }

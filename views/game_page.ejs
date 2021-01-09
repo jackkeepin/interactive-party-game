@@ -17,34 +17,39 @@
             <a id="title" href="/">Another interactive party game</a>
         </div>
 
-        <div class="centered">
-            <h1 id="gameCodeTitle">Game code: </h1>
+        <div id="setupGameDiv">
+            <div class="centered">
+                <h1 id="gameCodeTitle">Game code: </h1>
 
-            <div class="centered enterDetailsBox">
-                <input type="text" maxlength="10"  id="nicknameInput" placeholder="Enter your nickname"><br>
-                <p id="nicknameWarning" max hidden>Nickname must be 10 characters or less</p><br>
-                <button id="nicknameButton">Confirm nickname</button>
-            </div>
+                <div class="centered enterDetailsBox">
+                    <input type="text" maxlength="10"  id="nicknameInput" placeholder="Enter your nickname"><br>
+                    <p id="nicknameWarning" max hidden>Nickname must be 10 characters or less</p><br>
+                    <button id="nicknameButton">Confirm nickname</button>
+                </div>
 
 
-            <div id="displayPlayersBox">
-                <br><br>
-                <p id="connectedPlayers"></p>
+                <div id="displayPlayersBox">
+                    <br><br>
+                    <p id="connectedPlayers"></p>
+                    
+                    <div id="playersList"></div>
+                </div>
+
+
+                <div id="categoriesBox">
+                    <!-- <p id="categoriesHeader">Select a category:</p> -->
+
+                    <div id="selectCategoryBox"></div>
+                </div>
                 
-                <div id="playersList"></div>
+
+                <div id="startGameButtonDiv"></div>
+
             </div>
-
-
-            <div id="categoriesBox">
-                <!-- <p id="categoriesHeader">Select a category:</p> -->
-
-                <div id="selectCategoryBox"></div>
-            </div>
-            
-
-            <div id="startGameButtonDiv"></div>
-
         </div>
 
+        <div id="playGameDiv" hidden>
+            <h1>If you see this the game has started</h1>
+        </div>
     </body>
 </html>

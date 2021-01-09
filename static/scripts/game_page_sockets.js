@@ -30,7 +30,7 @@ $(function() {
     socket.on("return categories", function(data) {
         let categories = data;
         for (let category of categories) {
-            $("#selectCategoryBox").append("<input type='radio' name='categoryRadio' id='categorySelection'>" + category);
+            $("#selectCategoryBox").append("<input type='radio' name='categoryRadio' id='categorySelection' value='" + category + "'>" + category);
         }
     });
   
@@ -43,6 +43,28 @@ $(function() {
             $("#nicknameWarning").css("display", "");
             socket.emit("set nickname", [gameCode, nickname]);
         }
+    });
+
+    $("#startGameButton").click(function(){
+
+        let category = $("input[name='categoryRadio']:checked").val();
+        if (category == null) {
+            console.log("hell yeah")
+        }
+        socket.emit("validate game", [gameCode, category]);
+
+        console.log("end of start click");
+        
+    });
+
+    socket.on("start game", function(data) {
+        $("#setupGameDiv").hide();
+        $("#playGameDiv").show();
+    })
+
+    socket.on("validate game error", function(data) {
+        let error = data;
+        alert(error);
     });
 
     socket.on("new game code", function(data) {
