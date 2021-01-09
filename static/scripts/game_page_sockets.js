@@ -22,6 +22,8 @@ $(function() {
     if (gameCreator == "true") {
         console.log("about to get categories")
         socket.emit("get categories", gameCode);
+        $("#selectCategoryBox").append("<p id='categoriesHeader'>Select a category:</p>");
+        
     }    
 
     //when available categories recieved from server, display for user to select
