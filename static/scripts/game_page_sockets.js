@@ -62,9 +62,22 @@ $(function() {
         $("#setupGameDiv").hide();
         $("#playGameDiv").show();
         if (gameCreator == "true") {
+            console.log(gameCode)
+            console.log("about to get prompt event")
             socket.emit("get prompt", gameCode)
         }
     })
+
+    //when prompt is recieved from server
+    socket.on("return prompt", function(data) {
+        console.log("prompt recieved from server!!")
+        console.log(data);
+    });
+
+    socket.on("vip event", function(data) {
+        console.log("vip event recieved from server!!")
+        console.log(data);
+    });
 
     //if validation to start game fails
     socket.on("validate game error", function(data) {

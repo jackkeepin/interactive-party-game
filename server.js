@@ -140,25 +140,50 @@ io.on("connection", function(socket) {
             }
         }
 
-        //add scores to users dict ready for game
+        //add scores to users dict ready for game as well as socket id's to VIP array
         users[gameCode]["scores"] = {};
+        users[gameCode]["vip"] = []
         for (key in users[gameCode]["users"]) {
             users[gameCode]["scores"][key] = 0;
+            users[gameCode]["vip"].push(key);
         }
 
+        //add the category being used by the players to users dict
         users[gameCode]["category"] =  category;
 
         Prompts.find({"category": category})
             .then(function(response) {
                 users[gameCode]["prompts"] = response[0]["questions"];
+                io.to(gameCode).emit("start game");
             });
 
-        //need to return which client is VIP, maybe do that on different socket event
-        io.to(gameCode).emit("start game");
     });
 
+    //Get a prompt and select a client to be VIP
     socket.on("get prompt", function(data) {
        let gameCode =  data;
+
+       let numOfPotentialVip = (users[gameCode]["vip"].length) - 1;
+       //if all users have been vip, refill vip array and pick again
+       if (numOfPotentialVip < 0) {
+           for (key in users[gameCode]["users"]) {
+               users[gameCode]["vip"].push(key);
+            }
+            numOfPotentialVip = (users[gameCode]["vip"].length) - 1;
+       }
+
+       let vipIndex = Math.floor(Math.random() * numOfPotentialVip);
+       let vipSocketId = users[gameCode]["vip"][vipIndex];
+       users[gameCode]["vip"].splice(vipIndex, 1)
+
+       //select a random prompt and remove it from array so it isn't used again
+       let numOfPrompts = (users[gameCode]["prompts"].length) - 1;
+       let index = Math.floor(Math.random() * numOfPrompts);
+       let promptToReturn = users[gameCode]["prompts"][index];       
+       users[gameCode]["prompts"].splice(index, 1)
+
+       io.to(gameCode).emit("return prompt", promptToReturn)
+       io.to(vipSocketId).emit("vip event", "you're the VIP!")
 
     });
 
