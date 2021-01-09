@@ -57,37 +57,43 @@ $(function() {
         
     });
 
+    //When server starts game
     socket.on("start game", function(data) {
         $("#setupGameDiv").hide();
         $("#playGameDiv").show();
+        if (gameCreator == "true") {
+            socket.emit("get prompt", gameCode)
+        }
     })
 
+    //if validation to start game fails
     socket.on("validate game error", function(data) {
         let error = data;
         alert(error);
     });
 
+    //if a game code is already in use, replace gameCode in sessionstorage with new code
     socket.on("new game code", function(data) {
-        //update room code in session storage if room code already in use on server
         sessionStorage.setItem("gameCode", data);
         gameCode = sessionStorage.getItem("gameCode");
         $("#gameCodeTitle").text("Game code: " + gameCode);
     });
 
+    //if invalid game code is entered
     socket.on("invalid game code", function(data) {
-        //display warning saying invalid game code and redirect to home
         console.log("invalid game gode warning received");
         alert("Sorry, that is an invalid game code. You will now be redirected back to the home page.");
         location.href = "/";
     });
 
+    //if game is full
     socket.on("room full warning", function(data) {
-        //display warning and redirect back to home
         console.log("room full warning received game_page_sockets file");
         alert("Sorry, the room is already full. You will now be redirected back to the home page.");
         location.href = "/";
     });
 
+    //if server sends dict with users currently in the room
     socket.on("return users dict", function(data) {
         console.log("recieved users dict from server, look below");
         console.log(data);

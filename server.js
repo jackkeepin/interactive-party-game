@@ -3,7 +3,7 @@ let http = require("http");
 let path = require("path");
 let socketio = require("socket.io");
 let mongoose = require("mongoose");
-let Prompts = require("./models/prompt")
+let Prompts = require("./models/prompt");
 const port = process.env.PORT || 9000;
 
 
@@ -33,7 +33,9 @@ app.get("/game-page", function(request, response) {
     response.render("game_page");
 })
 
+//Data structure to be used to rooms and information
 var users = {};
+
 io.on("connection", function(socket) {
     socket.emit("confirm connection", "successfully connected - from server");
 
@@ -49,7 +51,7 @@ io.on("connection", function(socket) {
         
         //if client clicked new game
         if (isRoomExist == false && gameCreator == "true") {
-            users[gameCode] = {};
+            users[gameCode] = {"users": {}};
         }
         //if new game has been created and random code is already in use for another room
         else if(isRoomExist == true && gameCreator == "true") {
@@ -62,7 +64,7 @@ io.on("connection", function(socket) {
             socket.join(gameCode);
             io.to(socketId).emit("new game code", gameCode);
             
-            users[gameCode] = {};
+            users[gameCode] = {"users": {}};
         }
         //if client trying to join room that doesn't exist
         else if (isRoomExist == false && gameCreator == "false") {
@@ -71,20 +73,19 @@ io.on("connection", function(socket) {
         }
         
         //add socket id and empty username (because it has not been set) to users dict
-        users[gameCode][socketId] = "";
+        users[gameCode]["users"][socketId] = "";
 
         //If the user that just joined results in too many players joining the room, remove from users dict and return warning
-        let numUsersInRoom = (Object.keys(users[gameCode])).length;
+        let numUsersInRoom = (Object.keys(users[gameCode]["users"])).length;
         if (numUsersInRoom >=7) {
-            console.log("room at max capacity")
-            delete users[gameCode][socketId];
+            delete users[gameCode]["users"][socketId];
             io.to(socketId).emit("room full warning", "The room is already full");
             // at this point the client will send disconnecting event to server
             return;
         }
 
         //send back users, but only clients in the same room
-        io.to(gameCode).emit("return users dict", users[gameCode]);
+        io.to(gameCode).emit("return users dict", users[gameCode]["users"]);
     });
 
 
@@ -94,9 +95,9 @@ io.on("connection", function(socket) {
 
         //assign nickname to socket and update users dict
         socket.username = nickname;
-        users[gameCode][socket.id] = socket.username;
+        users[gameCode]["users"][socket.id] = socket.username;
 
-        io.to(gameCode).emit("return users dict", users[gameCode]);
+        io.to(gameCode).emit("return users dict", users[gameCode]["users"]);
     });
 
     socket.on("get categories", function(data){
@@ -117,7 +118,7 @@ io.on("connection", function(socket) {
         let category = data[1];
 
         //check there are at least 3 players in game
-        let numUsersInRoom = (Object.keys(users[gameCode])).length;
+        let numUsersInRoom = (Object.keys(users[gameCode]["users"])).length;
         if(numUsersInRoom <= 2) {
             io.to(socket.id).emit("validate game error", "There must be at least three players in the game to start!");
             return;
@@ -130,8 +131,8 @@ io.on("connection", function(socket) {
         }
 
         //Check all clients have submitted a username
-        for (key in users[gameCode]) {
-            if (users[gameCode][key] == "") {
+        for (key in users[gameCode]["users"]) {
+            if (users[gameCode]["users"][key] == "") {
                 //send error to client that started game and client without nickname
                 io.to(socket.id).emit("validate game error", "All players must enter a nickname!");
                 io.to(key).emit("validate game error", "You must enter a nickname!")
@@ -139,8 +140,26 @@ io.on("connection", function(socket) {
             }
         }
 
+        //add scores to users dict ready for game
+        users[gameCode]["scores"] = {};
+        for (key in users[gameCode]["users"]) {
+            users[gameCode]["scores"][key] = 0;
+        }
+
+        users[gameCode]["category"] =  category;
+
+        Prompts.find({"category": category})
+            .then(function(response) {
+                users[gameCode]["prompts"] = response[0]["questions"];
+            });
+
         //need to return which client is VIP, maybe do that on different socket event
         io.to(gameCode).emit("start game");
+    });
+
+    socket.on("get prompt", function(data) {
+       let gameCode =  data;
+
     });
 
     socket.on("disconnecting", function(data) {
@@ -154,21 +173,20 @@ io.on("connection", function(socket) {
 
         //remove socket from users dict and socketio room
         if (isRoomExist == true) {
-            if (socketId in users[gameCode]){
-                delete users[gameCode][socketId];
+            if (socketId in users[gameCode]["users"]){
+                delete users[gameCode]["users"][socketId];
                 socket.leave(gameCode);
             }
         }
        
         //If all users leave a room, remove room from users dict
         if (isRoomExist == true) {
-            let numUsersInRoom = (Object.keys(users[gameCode])).length;
+            let numUsersInRoom = (Object.keys(users[gameCode]["users"])).length;
             if (numUsersInRoom == 0) {
                 delete users[gameCode];
             }
         }
-        
-        io.to(gameCode).emit("return users dict", users[gameCode]);
+
     });
 
 });
