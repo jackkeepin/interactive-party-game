@@ -4,7 +4,6 @@ import "https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"
 $(function() {
     
     let socket = io();
-    // let socket = io("http://localhost:9000");
 
     let gameCode = sessionStorage.getItem("gameCode");
     let gameCreator = sessionStorage.getItem("gameCreator");
@@ -16,13 +15,22 @@ $(function() {
     console.log('game code below from local storage')
     console.log(gameCode)
 
-    console.log("socketid cleint side below")
-    console.log(socket.id);
-
     socket.emit("join room", [gameCode, gameCreator]);
 
     $("#gameCodeTitle").text("Game code: " + gameCode);
 
+    if (gameCreator == "true") {
+        console.log("about to get categories")
+        socket.emit("get categories", gameCode);
+    }    
+
+    //when available categories recieved from server, display for user to select
+    socket.on("return categories", function(data) {
+        let categories = data;
+        for (let category of categories) {
+            $("#selectCategoryBox").append("<input type='radio' name='categoryRadio' id='categorySelection'>" + category);
+        }
+    });
   
     $("#nicknameButton").click(function() {
         let nickname = $("#nicknameInput").val();

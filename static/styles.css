@@ -25,23 +25,8 @@ body {
   margin-top: 5%;
 }
 
-.centeredNew {
-  margin: auto;
-  text-align: center;
-}
-
 .centered {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -25%);
-}
-
-.centeredTop {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -180%);
+  margin: auto;
   text-align: center;
 }
 
@@ -130,6 +115,19 @@ body {
   margin-top: 1%;
 }
 
-#connectedPlayers {
+#connectedPlayers,
+#categoriesHeader {
   font-size: x-large;
+}
+
+#categorySelection {
+  font-size: large;
+  max-width: fit-content;
+  display: inline;
+  margin-left: 2%;
+  padding: 0.5%;
+}
+
+#categorySelection:hover {
+  cursor: pointer;
 }

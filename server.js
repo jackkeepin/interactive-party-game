@@ -3,6 +3,7 @@ let http = require("http");
 let path = require("path");
 let socketio = require("socket.io");
 let mongoose = require("mongoose");
+let Prompts = require("./models/prompt")
 const port = process.env.PORT || 9000;
 
 
@@ -10,6 +11,11 @@ let app = express();
 let server = http.createServer(app);
 let io = socketio(server);
 
+//Connect to MongoDB
+let dbURI = "mongodb+srv://jkeepin:Password123@comp3006-cw.qgmz0.mongodb.net/interactive-party-game-prompts?retryWrites=true&w=majority";
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then((result) => console.log("connected to db: " + result))
+    .catch((err) => console.log("error: " + err));
 
 //Setup app to use EJS templates
 app.set("views", path.join(__dirname, "views"));
@@ -91,6 +97,19 @@ io.on("connection", function(socket) {
         users[gameCode][socket.id] = socket.username;
 
         io.to(gameCode).emit("return users dict", users[gameCode]);
+    });
+
+    socket.on("get categories", function(data){
+        let gameCode = data;
+
+        Prompts.find().select("category -_id")
+            .then(function(response) {
+                let categories = []
+                response.forEach(element => {
+                    categories.push(element["category"]);
+                });
+                io.to(socket.id).emit("return categories", categories);
+            });
     });
 
     socket.on("disconnecting", function(data) {
