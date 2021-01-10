@@ -33,6 +33,7 @@ app.get("/game-page", function(request, response) {
     response.render("game_page");
 })
 
+
 //Data structure to be used to rooms and information
 var users = {};
 
@@ -184,6 +185,12 @@ io.on("connection", function(socket) {
 
        //select a random prompt and remove it from array so it isn't used again
        let numOfPrompts = (users[gameCode]["prompts"].length); // -1 here
+
+       //if there are no prompts left, end the game
+       if (numOfPrompts == 0) {
+           io.to(gameCode).emit("end game", users[gameCode]["scores"]);
+           return;
+       }
 
        let index = Math.floor(Math.random() * numOfPrompts);
        let promptToReturn = users[gameCode]["prompts"][index];       
