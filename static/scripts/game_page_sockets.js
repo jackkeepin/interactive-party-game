@@ -117,6 +117,7 @@ $(function() {
 
         if (socket.id == vipSocketId) {
             console.log("youre still vip bro");
+            $("#selectAnswerDiv").append("<h1>Select your favourite answer!</h1>");
             for (let [socketID, answer] of Object.entries(answers)) {
                 $("#selectAnswerDiv").append("<button id='selectAnswerButton' value='" + socketID +"'>" + answer + "</button>");
             }

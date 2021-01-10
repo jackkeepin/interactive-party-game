@@ -9,7 +9,7 @@
         <!-- <script src="/socket.io/socket.io.js"></script> -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 
-        <script src="/scripts/index_scripts.js"></script>
+        <script src="/scripts/create_prompts_scripts.js"></script>
     </head>
 
     <body>
@@ -19,20 +19,22 @@
         </div>
 
         <div class="centered">
-            <h1 id="newGameTitle">Click here to create a new game!</h1>
-            <button id="newGameButton">New game</button><br><br>
+            <h1 id="createPromptTitle">Enter a category title and questions to create a prompt set!</h1>
+
+            <div class="centered" id="newPromptDataBox">
+                <input type="text" maxlength="20"  id="categoryInput" placeholder="Enter category title"><br>
+    
+                <div class="promptInputDiv">
+                    <input type="text" maxLength="100" class="promptInput" placeholder="Enter prompt"><button class="addPromptButton">+</button>
+                </div>
+                
+            </div>
+
+            <button id="submitPromptDataButton">Submit</button>
         </div>
+
         
-
-        <div class="centered enterDetailsBox">
-            <h1 id="joinGameTitle">Enter details to join a game!</h1>
-
-            <input type="text" maxlength="4" class="gameInputs" id="gameCode" placeholder="Enter game code"><br>
-            <p id='gameCodeWarning' hidden>Not a valid game code!</p>
-
-            <button id="joinGameButton">Join game</button>
-        </div>
-
+        
     </body>
 
 </html>

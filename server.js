@@ -4,6 +4,7 @@ let path = require("path");
 let socketio = require("socket.io");
 let mongoose = require("mongoose");
 let Prompts = require("./models/prompt");
+// let promptsLogic = require("./scripts/prompts_logic");
 const port = process.env.PORT || 9000;
 
 
@@ -32,6 +33,10 @@ app.get("/", function(request, response) {
 app.get("/game-page", function(request, response) {
     response.render("game_page");
 })
+
+app.get("/create-prompt", function(request, response) {
+    response.render("create_prompts");
+});
 
 
 //Data structure to be used to rooms and information
@@ -274,6 +279,28 @@ io.on("connection", function(socket) {
             }
         }
 
+    });
+
+    socket.on("create prompt set", function(data) {
+        console.log("creatte prompt event received")
+        let cat = data[0];
+        let promptInputs = data[1];
+
+        console.log(cat);
+        console.log(promptInputs)
+
+        let prompts = new Prompts({
+            category: cat,
+            questions: promptInputs
+        });
+
+        prompts.save()
+        .then(function(result) {
+            console.log(result);
+            // return(result);
+            io.to(socket.id).emit("prompt created")
+        })
+        
     });
 
 });
