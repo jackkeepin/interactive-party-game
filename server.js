@@ -143,6 +143,7 @@ io.on("connection", function(socket) {
         //add scores to users dict ready for game as well as socket id's to VIP array
         users[gameCode]["scores"] = {};
         users[gameCode]["vip"] = []
+        users[gameCode]["submittedAnswers"] = {};
         for (key in users[gameCode]["users"]) {
             users[gameCode]["scores"][key] = 0;
             users[gameCode]["vip"].push(key);
@@ -163,27 +164,49 @@ io.on("connection", function(socket) {
     socket.on("get prompt", function(data) {
        let gameCode =  data;
 
-       let numOfPotentialVip = (users[gameCode]["vip"].length) - 1;
+       users[gameCode]["vip"] =[]
+       let numOfPotentialVip = (users[gameCode]["vip"].length);// -1 here
        //if all users have been vip, refill vip array and pick again
-       if (numOfPotentialVip < 0) {
+       if (numOfPotentialVip <= 0) {
            for (key in users[gameCode]["users"]) {
                users[gameCode]["vip"].push(key);
             }
-            numOfPotentialVip = (users[gameCode]["vip"].length) - 1;
+            numOfPotentialVip = (users[gameCode]["vip"].length);// -1 here
        }
 
        let vipIndex = Math.floor(Math.random() * numOfPotentialVip);
        let vipSocketId = users[gameCode]["vip"][vipIndex];
        users[gameCode]["vip"].splice(vipIndex, 1)
 
+       users[gameCode]["currentVip"] = vipSocketId;
+
        //select a random prompt and remove it from array so it isn't used again
-       let numOfPrompts = (users[gameCode]["prompts"].length) - 1;
+       let numOfPrompts = (users[gameCode]["prompts"].length); // -1 here
+
        let index = Math.floor(Math.random() * numOfPrompts);
        let promptToReturn = users[gameCode]["prompts"][index];       
        users[gameCode]["prompts"].splice(index, 1)
 
        io.to(gameCode).emit("return prompt", [promptToReturn, vipSocketId]);
-       
+
+    });
+
+    socket.on("submit answer", function(data) {
+
+        let answer = data[0];
+        let socketId = data[1];
+        let gameCode = data[2];
+        let vipSocketId = users[gameCode]["currentVip"]
+
+        users[gameCode]["submittedAnswers"][socketId] = answer;
+
+        let numOfResponses = Object.keys(users[gameCode]["submittedAnswers"]).length;
+        let numOfClients = Object.keys(users[gameCode]["users"]).length;
+
+        if (numOfResponses == numOfClients - 1){
+            io.to(gameCode).emit("all answers", [users[gameCode]["submittedAnswers"], vipSocketId]);
+        }
+
     });
 
     socket.on("disconnecting", function(data) {

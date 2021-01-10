@@ -94,10 +94,34 @@ $(function() {
         }
     });
 
+    //when user submits answer, remove input elements and send response to server
     $(document).on("click", "#answerButton", function() {
         let answer = $("#answerInput").val();
+        $("#answerInput").remove();
+        $("#answerButton").remove();
+        $("#answerInputDiv").append("<h1 id='waitMessage'>Please wait for other players to submit their answers!<h1>")
 
-        socket.emit("submit answer", [answer, socket.id])
+        socket.emit("submit answer", [answer, socket.id, gameCode]);
+    });
+
+    socket.on("all answers", function(data) {
+        $("#answerInputDiv").remove();
+        $("#vipMessageDiv").remove();
+        let answers = data[0];
+        let vipSocketId = data[1];
+
+        if (socket.id == vipSocketId) {
+            console.log("youre still vip bro");
+            for (let [socketID, answer] of Object.entries(answers)) {
+                $("#selectAnswerDiv").append("<button id='selectAnswerButton' value='" + socketID +"'>" + answer + "</button>");
+            }
+        }
+        else {
+            console.log("you still aint vip");
+            for (let [socketID, answer] of Object.entries(answers)) {
+                $("#viewAnswersDiv").append("<p id='displayAnswer'>" + answer + "</p>");
+            }
+        }
     });
 
     //if validation to start game fails
