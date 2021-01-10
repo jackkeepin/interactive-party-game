@@ -182,9 +182,8 @@ io.on("connection", function(socket) {
        let promptToReturn = users[gameCode]["prompts"][index];       
        users[gameCode]["prompts"].splice(index, 1)
 
-       io.to(gameCode).emit("return prompt", promptToReturn)
-       io.to(vipSocketId).emit("vip event", "you're the VIP!")
-
+       io.to(gameCode).emit("return prompt", [promptToReturn, vipSocketId]);
+       
     });
 
     socket.on("disconnecting", function(data) {

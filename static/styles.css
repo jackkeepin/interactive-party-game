@@ -41,7 +41,8 @@ body {
 #newGameButton,
 #startGameButton,
 #joinGameButton,
-#nicknameButton {
+#nicknameButton,
+#answerButton {
   font-size: x-large;
   border-radius: 5%;
   transition: all 0.2s;
@@ -54,7 +55,8 @@ body {
 #newGameButton:hover,
 #startGameButton:hover,
 #joinGameButton:hover,
-#nicknameButton:hover {
+#nicknameButton:hover,
+#answerButton:hover {
   background-color: #b5838d;
   cursor: pointer;
   box-shadow: none;
@@ -134,4 +136,18 @@ body {
 
 #categorySelection:hover {
   cursor: pointer;
+}
+
+#answerInput {
+  font-size: xx-large;
+  font-weight: 900;
+}
+
+#displayPromptDiv {
+  margin-top: 4%;
+}
+
+#answerInputDiv,
+#vipMessageDiv {
+  margin-top: 8%;
 }

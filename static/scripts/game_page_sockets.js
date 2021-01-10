@@ -64,19 +64,40 @@ $(function() {
         if (gameCreator == "true") {
             console.log(gameCode)
             console.log("about to get prompt event")
-            socket.emit("get prompt", gameCode)
+            socket.emit("get prompt", gameCode);
         }
     })
 
     //when prompt is recieved from server
     socket.on("return prompt", function(data) {
         console.log("prompt recieved from server!!")
-        console.log(data);
+
+        let prompt = data[0];
+
+        //by default, no client is vip unless one received vip event from server
+        let vipSocketId = data[1];
+        let isVip = "false";
+        if (socket.id == vipSocketId) {
+            isVip =  "true"
+        }
+
+        $("#displayPromptDiv").append("<h1 id='displayPrompt'>" + prompt +"</div>");
+
+        if (isVip == "false") {
+            //display inputs
+            $("#answerInputDiv").append("<input type='text' maxlength='80'  id='answerInput' placeholder='Enter your answer'><br>")
+            $("#answerInputDiv").append("<button id='answerButton'>Confirm answer</button>")
+        }
+        else {
+            //display message to wait for other inputs
+            $("#vipMessageDiv").append("<h1 id='waitMessage'>You're the VIP! Wait for other users to submit their answers!</h1>")
+        }
     });
 
-    socket.on("vip event", function(data) {
-        console.log("vip event recieved from server!!")
-        console.log(data);
+    $(document).on("click", "#answerButton", function() {
+        let answer = $("#answerInput").val();
+
+        socket.emit("submit answer", [answer, socket.id])
     });
 
     //if validation to start game fails
