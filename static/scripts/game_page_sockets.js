@@ -137,7 +137,6 @@ $(function() {
 
     //start the next round by getting the next prompt
     socket.on("next round", function(data) {
-        console.log("next round received lets gooooo")
         $("#displayPromptDiv").empty();
         $("#viewAnswersDiv").empty();
         $("#selectAnswerDiv").empty();
@@ -150,8 +149,6 @@ $(function() {
     });
 
     socket.on("end game", function(data) {
-        console.log("end game event received, game over!!!");
-        console.log(data);
         let scores = data;
         $("#displayPromptDiv").empty();
         $("#viewAnswersDiv").empty();
