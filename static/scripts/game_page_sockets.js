@@ -36,11 +36,12 @@ $(function() {
   
     $("#nicknameButton").click(function() {
         let nickname = $("#nicknameInput").val();
-        if (nickname.length > 10 || nickname.length <= 0) {
-            $("#nicknameWarning").css("display", "inline-block");
+        $("#nicknameWarning").remove();
+        if (nickname.length > 20 || nickname.length <= 0) {
+            $("#nicknameInput").after("<p id='nicknameWarning'>Nickname must be 10 characters or less</p>");
         }
         else {
-            $("#nicknameWarning").css("display", "");
+            $("#nicknameWarning").remove();
             socket.emit("set nickname", [gameCode, nickname]);
         }
     });
