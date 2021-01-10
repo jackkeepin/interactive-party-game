@@ -113,6 +113,7 @@ $(function() {
         $("#vipMessageDiv").empty();
         let answers = data[0];
         let vipSocketId = data[1];
+        let users = data[2];
 
         if (socket.id == vipSocketId) {
             console.log("youre still vip bro");
@@ -123,7 +124,7 @@ $(function() {
         else {
             console.log("you still aint vip");
             for (let [socketID, answer] of Object.entries(answers)) {
-                $("#viewAnswersDiv").append("<p id='displayAnswer'>" + answer + "</p>");
+                $("#viewAnswersDiv").append("<p id='displayAnswer'><strong>" + users[socketID] + "</strong>: " + answer + "</p>");
             }
         }
     });
@@ -153,26 +154,17 @@ $(function() {
     });
 
     socket.on("end game", function(data) {
-        let scores = data;
+        let scores = data[0];
+        let users = data[1];
         $("#displayPromptDiv").empty();
         $("#viewAnswersDiv").empty();
         $("#selectAnswerDiv").empty();
 
-        //sort scores higest to lowest
-        let sortedScores = Object.keys(scores).map(function(key) {
-            return [key, scores[key]];
-        });
-        sortedScores.sort(function(first, second) {
-            return second[1] - first[1];
-        });
-
-        for (let score of sortedScores) {
+        for (let score of scores) {
             console.log(score);
-            $("#displayResultsDiv").append("<p id='playerScore'>" + score[0] + " achieved " + score[1] + " points!" +  "</p><br>");
+            $("#displayResultsDiv").append("<p id='playerScore'>" + users[score[0]] + " achieved " + score[1] + " points!" +  "</p><br>");
         }
         $("#displayResultsDiv").append("<button id='quitGameButton'>Quit</button>");
-        console.log(data);
-        console.log(sortedScores);
 
     })
 

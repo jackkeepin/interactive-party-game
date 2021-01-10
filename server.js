@@ -212,8 +212,11 @@ io.on("connection", function(socket) {
         let numOfResponses = Object.keys(users[gameCode]["submittedAnswers"]).length;
         let numOfClients = Object.keys(users[gameCode]["users"]).length;
 
+        let usersInGame = users[gameCode]["users"];
+        let submittedAnswers = users[gameCode]["submittedAnswers"];
+
         if (numOfResponses == numOfClients - 1){
-            io.to(gameCode).emit("all answers", [users[gameCode]["submittedAnswers"], vipSocketId]);
+            io.to(gameCode).emit("all answers", [submittedAnswers, vipSocketId, usersInGame]);
         }
 
     });
@@ -228,7 +231,16 @@ io.on("connection", function(socket) {
         //check if any users have reached required points to win
         for (let [socketID, score] of Object.entries(users[gameCode]["scores"])) {
             if (score == maxPoints) {
-                io.to(gameCode).emit("end game", users[gameCode]["scores"]);
+                let usersInGame = users[gameCode]["users"]
+                let finalScores = users[gameCode]["scores"];
+                let sortedScores = Object.keys(finalScores).map(function(key) {
+                    return [key, finalScores[key]];
+                });
+                sortedScores.sort(function(first, second) {
+                    return second[1] - first[1];
+                });
+
+                io.to(gameCode).emit("end game", [sortedScores, usersInGame]);
                 return;
             }
         }
