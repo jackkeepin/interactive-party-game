@@ -160,9 +160,10 @@ $(function() {
         $("#viewAnswersDiv").empty();
         $("#selectAnswerDiv").empty();
 
+        $("#displayResultsDiv").append("<h1 id='winnerMessage'>" + users[scores[0][0]] + " is the winner!" + "</h1><br>");
         for (let score of scores) {
             console.log(score);
-            $("#displayResultsDiv").append("<p id='playerScore'>" + users[score[0]] + " achieved " + score[1] + " points!" +  "</p><br>");
+            $("#displayResultsDiv").append("<p id='playerScore'><strong>" + users[score[0]] + "</strong> achieved " + score[1] + " points!" +  "</p><br>");
         }
         $("#displayResultsDiv").append("<button id='quitGameButton'>Quit</button>");
 
