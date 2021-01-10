@@ -105,8 +105,8 @@ $(function() {
     });
 
     socket.on("all answers", function(data) {
-        $("#answerInputDiv").remove();
-        $("#vipMessageDiv").remove();
+        $("#answerInputDiv").empty();
+        $("#vipMessageDiv").empty();
         let answers = data[0];
         let vipSocketId = data[1];
 
@@ -122,6 +122,62 @@ $(function() {
                 $("#viewAnswersDiv").append("<p id='displayAnswer'>" + answer + "</p>");
             }
         }
+    });
+
+    //send the socketId of the user that submitted the winning answer
+    $(document).on("click", "#selectAnswerButton", function() {
+        console.log("epiccc");
+        let selectedAnswerSocketId = $(this).val();
+        console.log(selectedAnswerSocketId);
+        socket.emit("selected answer", [gameCode, selectedAnswerSocketId]);
+        $("#displayPromptDiv").empty();
+        $("#viewAnswersDiv").empty();
+        $("#selectAnswerDiv").empty();
+    });
+
+    //start the next round by getting the next prompt
+    socket.on("next round", function(data) {
+        console.log("next round received lets gooooo")
+        $("#displayPromptDiv").empty();
+        $("#viewAnswersDiv").empty();
+        $("#selectAnswerDiv").empty();
+        
+        let gameCreator = sessionStorage.getItem("gameCreator");
+        if (gameCreator == "true") {
+            socket.emit("get prompt", gameCode);
+        }
+        
+    });
+
+    socket.on("end game", function(data) {
+        console.log("end game event received, game over!!!");
+        console.log(data);
+        let scores = data;
+        $("#displayPromptDiv").empty();
+        $("#viewAnswersDiv").empty();
+        $("#selectAnswerDiv").empty();
+
+        //sort scores higest to lowest
+        let sortedScores = Object.keys(scores).map(function(key) {
+            return [key, scores[key]];
+        });
+        sortedScores.sort(function(first, second) {
+            return second[1] - first[1];
+        });
+
+        for (let score of sortedScores) {
+            console.log(score);
+            $("#displayResultsDiv").append("<p id='playerScore'>" + score[0] + " achieved " + score[1] + " points!" +  "</p><br>");
+        }
+        $("#displayResultsDiv").append("<button id='quitGameButton'>Quit</button>");
+        console.log(data);
+        console.log(sortedScores);
+
+    })
+
+    $(document).on("click", "#quitGameButton", function() {
+        console.log("quit game button clicked");
+        location.href = "/";
     });
 
     //if validation to start game fails

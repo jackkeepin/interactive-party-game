@@ -36,6 +36,9 @@ app.get("/game-page", function(request, response) {
 //Data structure to be used to rooms and information
 var users = {};
 
+//Set number of points required to win a game
+var maxPoints = 3;
+
 io.on("connection", function(socket) {
     socket.emit("confirm connection", "successfully connected - from server");
 
@@ -163,8 +166,7 @@ io.on("connection", function(socket) {
     //Get a prompt and select a client to be VIP
     socket.on("get prompt", function(data) {
        let gameCode =  data;
-
-       users[gameCode]["vip"] =[]
+ 
        let numOfPotentialVip = (users[gameCode]["vip"].length);// -1 here
        //if all users have been vip, refill vip array and pick again
        if (numOfPotentialVip <= 0) {
@@ -207,6 +209,25 @@ io.on("connection", function(socket) {
             io.to(gameCode).emit("all answers", [users[gameCode]["submittedAnswers"], vipSocketId]);
         }
 
+    });
+
+    //add a point to the user that submitted the winning answer
+    socket.on("selected answer", function(data) {
+        let gameCode = data[0];
+        let winnerSocketId = data[1];
+
+        users[gameCode]["scores"][winnerSocketId]++;
+
+        //check if any users have reached required points to win
+        for (let [socketID, score] of Object.entries(users[gameCode]["scores"])) {
+            if (score == maxPoints) {
+                io.to(gameCode).emit("end game", users[gameCode]["scores"]);
+                return;
+            }
+        }
+
+        users[gameCode]["submittedAnswers"] = {};
+        io.to(gameCode).emit("next round");
     });
 
     socket.on("disconnecting", function(data) {
