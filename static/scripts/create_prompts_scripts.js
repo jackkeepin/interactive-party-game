@@ -1,5 +1,3 @@
-// import "/socket.io/socket.io.js"
-// import "https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"
 
 $(function() {
 

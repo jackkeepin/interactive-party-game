@@ -4,8 +4,10 @@ let path = require("path");
 let socketio = require("socket.io");
 let mongoose = require("mongoose");
 let Prompts = require("./models/prompt");
-// let promptsLogic = require("./scripts/prompts_logic");
+let gameLogic = require("./static/scripts/game_logic")
+let promptsLogic = require("./static/scripts/prompts_logic")
 const port = process.env.PORT || 9000;
+
 
 
 let app = express();
@@ -65,11 +67,7 @@ io.on("connection", function(socket) {
         //if new game has been created and random code is already in use for another room
         else if(isRoomExist == true && gameCreator == "true") {
             socket.leave(gameCode);
-            while (isRoomExist == true) {
-                gameCode = parseInt(Math.floor(1000 + Math.random() * 9000));
-                gameCode = gameCode.toString();
-                isRoomExist = (gameCode in users);
-            }
+            gameCode = gameLogic.newGameCode(isRoomExist, users);
             socket.join(gameCode);
             io.to(socketId).emit("new game code", gameCode);
             
@@ -102,12 +100,12 @@ io.on("connection", function(socket) {
         let gameCode = data[0];
         let nickname = data[1];
 
-        //assign nickname to socket and update users dict
-        socket.username = nickname;
-        users[gameCode]["users"][socket.id] = socket.username;
-
+        //assign nickname to socketId in users dict
+        gameLogic.setNickname(gameCode, nickname, socket.id, users)
+        
         io.to(gameCode).emit("return users dict", users[gameCode]["users"]);
     });
+
 
     socket.on("get categories", function(data){
         let gameCode = data;
@@ -122,44 +120,30 @@ io.on("connection", function(socket) {
             });
     });
 
+
     socket.on("validate game", function(data) {
         let gameCode = data[0];
         let category = data[1];
 
-        //check there are at least 3 players in game
-        let numUsersInRoom = (Object.keys(users[gameCode]["users"])).length;
-        if(numUsersInRoom <= 2) {
+        let err = gameLogic.validateGame(category, gameCode, users);
+        if (err == "Not enough players error") {
+            console.log("GOOD")
             io.to(socket.id).emit("validate game error", "There must be at least three players in the game to start!");
             return;
         }
-
-        //check a cetegory has been selected
-        if (category == null) {
+        else if(err == "No category error") {
             io.to(socket.id).emit("validate game error", "A category must be selected!");
             return;
         }
-
-        //Check all clients have submitted a username
-        for (key in users[gameCode]["users"]) {
-            if (users[gameCode]["users"][key] == "") {
-                //send error to client that started game and client without nickname
-                io.to(socket.id).emit("validate game error", "All players must enter a nickname!");
-                io.to(key).emit("validate game error", "You must enter a nickname!")
-                return;
-            }
+        else if(err == "Username error") {
+            //send error to client that started game and client without nickname
+            io.to(socket.id).emit("validate game error", "All players must enter a nickname!");
+            io.to(key).emit("validate game error", "You must enter a nickname!");
+            return
         }
 
         //add scores to users dict ready for game as well as socket id's to VIP array
-        users[gameCode]["scores"] = {};
-        users[gameCode]["vip"] = []
-        users[gameCode]["submittedAnswers"] = {};
-        for (key in users[gameCode]["users"]) {
-            users[gameCode]["scores"][key] = 0;
-            users[gameCode]["vip"].push(key);
-        }
-
-        //add the category being used by the players to users dict
-        users[gameCode]["category"] =  category;
+        gameLogic.readyDictForGame(users, gameCode, category);
 
         Prompts.find({"category": category})
             .then(function(response) {
@@ -169,42 +153,24 @@ io.on("connection", function(socket) {
 
     });
 
+
     //Get a prompt and select a client to be VIP
     socket.on("get prompt", function(data) {
        let gameCode =  data;
  
-       let numOfPotentialVip = (users[gameCode]["vip"].length);// -1 here
-       //if all users have been vip, refill vip array and pick again
-       if (numOfPotentialVip <= 0) {
-           for (key in users[gameCode]["users"]) {
-               users[gameCode]["vip"].push(key);
-            }
-            numOfPotentialVip = (users[gameCode]["vip"].length);// -1 here
-       }
+        let vipSocketId = gameLogic.getVipSocketId(gameCode, users);
 
-       let vipIndex = Math.floor(Math.random() * numOfPotentialVip);
-       let vipSocketId = users[gameCode]["vip"][vipIndex];
-       users[gameCode]["vip"].splice(vipIndex, 1)
+        let promptToReturn = gameLogic.selectRandomPrompt(gameCode, users);
 
-       users[gameCode]["currentVip"] = vipSocketId;
-
-       //select a random prompt and remove it from array so it isn't used again
-       let numOfPrompts = (users[gameCode]["prompts"].length); // -1 here
-
-       //if there are no prompts left, end the game
-       if (numOfPrompts == 0) {
-           io.to(gameCode).emit("end game", users[gameCode]["scores"]);
-           return;
-       }
-
-       let index = Math.floor(Math.random() * numOfPrompts);
-       let promptToReturn = users[gameCode]["prompts"][index];       
-       users[gameCode]["prompts"].splice(index, 1)
+        if (promptToReturn == "_End Game Event_") {
+            io.to(gameCode).emit("end game", users[gameCode]["scores"]);
+        }
 
        io.to(gameCode).emit("return prompt", [promptToReturn, vipSocketId]);
 
     });
 
+    //when answer received from client save it until all other clients have answered
     socket.on("submit answer", function(data) {
 
         let answer = data[0];
@@ -256,6 +222,7 @@ io.on("connection", function(socket) {
 
     socket.on("disconnecting", function(data) {
         //when a user disconnects from a game, remove from users dict
+        console.log("disconnecting now")
         let rooms = socket.rooms;
         rooms = rooms.values();
         let socketId = rooms.next().value;
@@ -267,6 +234,7 @@ io.on("connection", function(socket) {
         if (isRoomExist == true) {
             if (socketId in users[gameCode]["users"]){
                 delete users[gameCode]["users"][socketId];
+                console.log("just did delete")
                 socket.leave(gameCode);
             }
         }
@@ -279,6 +247,12 @@ io.on("connection", function(socket) {
             }
         }
 
+        //return users in room if room is still open
+        if (gameCode in users) {
+            io.to(gameCode).emit("return users dict", users[gameCode]["users"]);
+        }
+        
+
     });
 
     socket.on("create prompt set", function(data) {
@@ -288,11 +262,7 @@ io.on("connection", function(socket) {
 
         console.log(cat);
         console.log(promptInputs)
-
-        let prompts = new Prompts({
-            category: cat,
-            questions: promptInputs
-        });
+        let prompts = promptsLogic.createNewPrompt(cat, promptInputs);
 
         prompts.save()
         .then(function(result) {
