@@ -65,9 +65,7 @@ function getVipSocketId(gameCode, users) {
 
     users[gameCode]["currentVip"] = vipSocketId;
 
-    console.log("look here");
     return vipSocketId;
-    
 }
 
 function selectRandomPrompt(gameCode, users) {
@@ -86,9 +84,38 @@ function selectRandomPrompt(gameCode, users) {
        return promptToReturn;
 }
 
+function storeSubmittedAnswer(gameCode, users, answer, socketId) {
+    users[gameCode]["submittedAnswers"][socketId] = answer;
+
+    let numOfResponses = Object.keys(users[gameCode]["submittedAnswers"]).length;
+    let numOfClients = Object.keys(users[gameCode]["users"]).length;
+
+    if (numOfResponses == numOfClients - 1){
+        // io.to(gameCode).emit("all answers", [submittedAnswers, vipSocketId, usersInGame]);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function sortScores(finalScores) {
+    let sortedScores = Object.keys(finalScores).map(function(key) {
+        return [key, finalScores[key]];
+    });
+    sortedScores.sort(function(first, second) {
+        return second[1] - first[1];
+    });
+
+    return sortedScores;
+}
+
+
 module.exports.newGameCode = newGameCode;
 module.exports.setNickname = setNickname;
 module.exports.validateGame = validateGame;
 module.exports.readyDictForGame = readyDictForGame;
 module.exports.getVipSocketId = getVipSocketId;
 module.exports.selectRandomPrompt = selectRandomPrompt;
+module.exports.storeSubmittedAnswer = storeSubmittedAnswer;
+module.exports.sortScores = sortScores;

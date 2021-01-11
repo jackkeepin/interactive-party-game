@@ -105,7 +105,7 @@ $(function() {
         $("#answerButton").remove();
         $("#answerInputDiv").append("<h1 id='waitMessage'>Please wait for other players to submit their answers!<h1>")
 
-        socket.emit("submit answer", [answer, socket.id, gameCode]);
+        socket.emit("submit answer", [answer, gameCode]);
     });
 
     socket.on("all answers", function(data) {

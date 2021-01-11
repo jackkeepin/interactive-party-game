@@ -127,7 +127,6 @@ io.on("connection", function(socket) {
 
         let err = gameLogic.validateGame(category, gameCode, users);
         if (err == "Not enough players error") {
-            console.log("GOOD")
             io.to(socket.id).emit("validate game error", "There must be at least three players in the game to start!");
             return;
         }
@@ -174,22 +173,19 @@ io.on("connection", function(socket) {
     socket.on("submit answer", function(data) {
 
         let answer = data[0];
-        let socketId = data[1];
-        let gameCode = data[2];
-        let vipSocketId = users[gameCode]["currentVip"]
+        let gameCode = data[1];
+        let socketId = socket.id;
 
-        users[gameCode]["submittedAnswers"][socketId] = answer;
+        let vipSocketId = users[gameCode]["currentVip"];
 
-        let numOfResponses = Object.keys(users[gameCode]["submittedAnswers"]).length;
-        let numOfClients = Object.keys(users[gameCode]["users"]).length;
+        let isAnswersReceived = gameLogic.storeSubmittedAnswer(gameCode, users, answer, socketId, vipSocketId);
 
         let usersInGame = users[gameCode]["users"];
         let submittedAnswers = users[gameCode]["submittedAnswers"];
 
-        if (numOfResponses == numOfClients - 1){
+        if (isAnswersReceived == true) {
             io.to(gameCode).emit("all answers", [submittedAnswers, vipSocketId, usersInGame]);
         }
-
     });
 
     //add a point to the user that submitted the winning answer
@@ -204,12 +200,7 @@ io.on("connection", function(socket) {
             if (score == maxPoints) {
                 let usersInGame = users[gameCode]["users"]
                 let finalScores = users[gameCode]["scores"];
-                let sortedScores = Object.keys(finalScores).map(function(key) {
-                    return [key, finalScores[key]];
-                });
-                sortedScores.sort(function(first, second) {
-                    return second[1] - first[1];
-                });
+                let sortedScores = gameLogic.sortScores(finalScores);
 
                 io.to(gameCode).emit("end game", [sortedScores, usersInGame]);
                 return;
@@ -220,9 +211,9 @@ io.on("connection", function(socket) {
         io.to(gameCode).emit("next round");
     });
 
+
     socket.on("disconnecting", function(data) {
         //when a user disconnects from a game, remove from users dict
-        console.log("disconnecting now")
         let rooms = socket.rooms;
         rooms = rooms.values();
         let socketId = rooms.next().value;
@@ -234,7 +225,6 @@ io.on("connection", function(socket) {
         if (isRoomExist == true) {
             if (socketId in users[gameCode]["users"]){
                 delete users[gameCode]["users"][socketId];
-                console.log("just did delete")
                 socket.leave(gameCode);
             }
         }
@@ -251,17 +241,12 @@ io.on("connection", function(socket) {
         if (gameCode in users) {
             io.to(gameCode).emit("return users dict", users[gameCode]["users"]);
         }
-        
-
     });
 
     socket.on("create prompt set", function(data) {
-        console.log("creatte prompt event received")
         let cat = data[0];
         let promptInputs = data[1];
 
-        console.log(cat);
-        console.log(promptInputs)
         let prompts = promptsLogic.createNewPrompt(cat, promptInputs);
 
         prompts.save()
