@@ -42,7 +42,7 @@ app.get("/create-prompt", function(request, response) {
 
 
 //Data structure to be used to rooms and information
-var users = {3311: {}};
+var users = {};
 
 //Set number of points required to win a game
 var maxPoints = 3;
