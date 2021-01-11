@@ -15,11 +15,11 @@ suite("Test test", function() {
     });
 
 
-    test("Test newGameCode", function() {
+    test("Test generateNewGameCode", function() {
       let gameCode = 3311;
       let users = {gameCode: {} };
 
-      let newGeneratedCode = gameLogic.newGameCode(true, users);
+      let newGeneratedCode = gameLogic.generateNewGameCode(true, users);
 
 
       chai.assert.notEqual(gameCode, newGeneratedCode, "new code should be different");

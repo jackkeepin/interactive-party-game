@@ -42,7 +42,7 @@ app.get("/create-prompt", function(request, response) {
 
 
 //Data structure to be used to rooms and information
-var users = {};
+var users = {3311: {}};
 
 //Set number of points required to win a game
 var maxPoints = 3;
@@ -57,30 +57,23 @@ io.on("connection", function(socket) {
         socket.join(gameCode);
         let socketId = socket.id;
 
-        //if the room is newly created add an empty dict as a value to the gameCode key
-        let isRoomExist = (gameCode in users);
-        
-        //if client clicked new game
-        if (isRoomExist == false && gameCreator == "true") {
-            users[gameCode] = {"users": {}};
-        }
-        //if new game has been created and random code is already in use for another room
-        else if(isRoomExist == true && gameCreator == "true") {
+        //validate before allowing client to join room
+        let validateJoinGameResponse = gameLogic.validateJoinGame(gameCode, users, socketId, gameCreator);
+        if (validateJoinGameResponse == null) {}
+        else if (validateJoinGameResponse[0] == "new game code") {
+            gameCode = validateJoinGameResponse[1];
             socket.leave(gameCode);
-            gameCode = gameLogic.newGameCode(isRoomExist, users);
             socket.join(gameCode);
             io.to(socketId).emit("new game code", gameCode);
-            
-            users[gameCode] = {"users": {}};
         }
-        //if client trying to join room that doesn't exist
-        else if (isRoomExist == false && gameCreator == "false") {
+        else if(validateJoinGameResponse == "invalid game code") {
             io.to(socketId).emit("invalid game code", "The game code is incorrect");
             return;
         }
-        
+
         //add socket id and empty username (because it has not been set) to users dict
         users[gameCode]["users"][socketId] = "";
+        console.log(users)
 
         //If the user that just joined results in too many players joining the room, remove from users dict and return warning
         let numUsersInRoom = (Object.keys(users[gameCode]["users"])).length;

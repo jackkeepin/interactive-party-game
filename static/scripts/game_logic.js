@@ -1,12 +1,32 @@
-const { get } = require("mongoose");
 
-function newGameCode(isRoomExist, users) {
+function generateNewGameCode(isRoomExist, users) {
+    let gameCode;
     while (isRoomExist == true) {
         gameCode = parseInt(Math.floor(1000 + Math.random() * 9000));
         gameCode = gameCode.toString();
         isRoomExist = (gameCode in users);
     }
     return gameCode;
+}
+
+function validateJoinGame(gameCode, users, socketId, gameCreator) {
+    //if the room is newly created add an empty dict as a value to the gameCode key
+    let isRoomExist = (gameCode in users);
+
+    //if client clicked new game
+    if (isRoomExist == false && gameCreator == "true") {
+        users[gameCode] = {"users": {}};
+    }
+    //if new game has been created and random code is already in use for another room
+    else if(isRoomExist == true && gameCreator == "true") {
+        let newGameCode = generateNewGameCode(isRoomExist, users);
+        users[newGameCode] = {"users": {}};
+        return ["new game code", newGameCode];
+    }
+    //if client trying to join room that doesn't exist
+    else if (isRoomExist == false && gameCreator == "false") {
+        return ["invalid game code"];
+    }
 }
 
 function setNickname(gameCode, nickname, socketId, users) {
@@ -111,7 +131,8 @@ function sortScores(finalScores) {
 }
 
 
-module.exports.newGameCode = newGameCode;
+module.exports.validateJoinGame = validateJoinGame;
+module.exports.generateNewGameCode = generateNewGameCode;
 module.exports.setNickname = setNickname;
 module.exports.validateGame = validateGame;
 module.exports.readyDictForGame = readyDictForGame;
