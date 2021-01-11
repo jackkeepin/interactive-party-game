@@ -75,6 +75,8 @@ $(function() {
     //when prompt is recieved from server
     socket.on("return prompt", function(data) {
         console.log("prompt recieved from server!!")
+        $("#displayPromptDiv").empty();
+        $("#viewAnswersDiv").empty();
 
         let prompt = data[0];
 
@@ -144,27 +146,36 @@ $(function() {
 
     //send the socketId of the user that submitted the winning answer
     $(document).on("click", "#selectAnswerButton", function() {
-        console.log("epiccc");
         let selectedAnswerSocketId = $(this).val();
         console.log(selectedAnswerSocketId);
         socket.emit("selected answer", [gameCode, selectedAnswerSocketId]);
-        $("#displayPromptDiv").empty();
+
         $("#viewAnswersDiv").empty();
         $("#selectAnswerDiv").empty();
     });
 
-    //start the next round by getting the next prompt
-    socket.on("next round", function(data) {
-        $("#displayPromptDiv").empty();
+    socket.on("winner of round", function(data) {
+        // $("#displayPromptDiv").empty();
         $("#viewAnswersDiv").empty();
         $("#selectAnswerDiv").empty();
-        
+        let username = data[0];
+        let answer = data[1];
+
+        $("#viewAnswersDiv").append("<h1 id='winnerOfRoundUsername'>" + username + " wins the round!</h1>");
+        $("#viewAnswersDiv").append("<h2 id='winnerOfRoundAnswer'>" + answer + "</h2>");
+        if (gameCreator == "true") {
+            $("#viewAnswersDiv").append("<button id='nextRoundButton'>Next round</button>");
+        }
+    });
+
+    //start next round when button is clicked
+    $(document).on("click", "#nextRoundButton", function() {        
         let gameCreator = sessionStorage.getItem("gameCreator");
         if (gameCreator == "true") {
             socket.emit("get prompt", gameCode);
         }
-        
-    });
+    })   
+
 
     socket.on("end game", function(data) {
         let scores = data[0];

@@ -10,7 +10,7 @@ $(function() {
             return;
         }
         console.log(promptImp)
-        $("#newPromptDataBox").append("<div class='promptInputDiv'><input type='text' maxLength='100' class='promptInput' placeholder='Enter prompt' value='" + promptImp + " '><button class='removePromptButton'>-</button></div>")
+        $("#newPromptDataBox").append("<div class='promptInputDiv'><input type='text' maxLength='100' class='promptInput' placeholder='Enter question' value='" + promptImp + " '><button class='removePromptButton'>-</button></div>")
         $(this).prev("input").val("");
     });
 

@@ -199,8 +199,12 @@ io.on("connection", function(socket) {
             }
         }
 
+        let roundWinnerUsername = users[gameCode]["users"][winnerSocketId];
+        let roundWinnerAnswer = users[gameCode]["submittedAnswers"][winnerSocketId];
+
         users[gameCode]["submittedAnswers"] = {};
-        io.to(gameCode).emit("next round");
+
+        io.to(gameCode).emit("winner of round", [roundWinnerUsername, roundWinnerAnswer])
     });
 
 

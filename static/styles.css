@@ -52,7 +52,8 @@ body {
 #answerButton,
 #selectAnswerButton,
 #quitGameButton,
-#submitPromptDataButton {
+#submitPromptDataButton,
+#nextRoundButton {
   font-size: x-large;
   border-radius: 5%;
   transition: all 0.2s;
@@ -69,7 +70,8 @@ body {
 #answerButton:hover,
 #selectAnswerButton:hover,
 #quitGameButton:hover,
-#submitPromptDataButton:hover {
+#submitPromptDataButton:hover,
+#nextRoundButton:hover {
   background-color: #b5838d;
   cursor: pointer;
   box-shadow: none;
