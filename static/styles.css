@@ -109,7 +109,8 @@ body {
   font-weight: 900;
 }
 
-#nicknameWarning {
+#nicknameWarning,
+#answerInputWarning {
   display: block;
   text-align: center;
   margin-left: auto;

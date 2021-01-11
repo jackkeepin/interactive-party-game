@@ -101,11 +101,23 @@ $(function() {
     //when user submits answer, remove input elements and send response to server
     $(document).on("click", "#answerButton", function() {
         let answer = $("#answerInput").val();
-        $("#answerInput").remove();
-        $("#answerButton").remove();
-        $("#answerInputDiv").append("<h1 id='waitMessage'>Please wait for other players to submit their answers!<h1>")
-
-        socket.emit("submit answer", [answer, gameCode]);
+        if (answer.length < 1) {
+            //show warning if no input
+            console.log($("#answerInputWarning").length)
+            console.log(!$("#answerInputWarning").length)
+            if (!$("#answerInputWarning").length == true) {
+                $("#answerInput").after("<p id='answerInputWarning'>You must submit an answer!</p>");
+            }    
+        }
+        else {
+            $("#answerInput").remove();
+            $("#answerButton").remove();
+            $("#answerInputWarning").remove();
+            $("#answerInputDiv").append("<h1 id='waitMessage'>Please wait for other players to submit their answers!<h1>")
+    
+            socket.emit("submit answer", [answer, gameCode]);
+        }
+        
     });
 
     socket.on("all answers", function(data) {
