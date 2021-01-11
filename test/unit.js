@@ -1,19 +1,7 @@
 let chai = require("chai");
 let gameLogic = require("../static/scripts/game_logic");
 
-suite("Test test", function() {
-
-    test("Quick test", function() {
-      // Initialise a counter.
-      let counter = 0;
-  
-      for (let i=0; i<100; i++) {
-          counter++;
-      }
-  
-      chai.assert.equal(counter, 100, "Answer should be 100");
-    });
-
+suite("Test game_logic", function() {
 
     test("Test generateNewGameCode", function() {
       let gameCode = 3311;
@@ -24,6 +12,44 @@ suite("Test test", function() {
 
       chai.assert.notEqual(gameCode, newGeneratedCode, "new code should be different");
       chai.assert.equal(newGeneratedCode.length, 4, "new code should be 4 digits long");
+    });
+
+    test("Test validateJoinGame new game", function() {
+      let users = {};
+      let gameCode = 2211;
+      let gameCreator = "true";
+
+      let validateJoinGameResponse = gameLogic.validateJoinGame(gameCode, users, gameCreator);
+
+      let isRoomExist = (gameCode in users);
+
+      chai.assert.equal(validateJoinGameResponse, null, "Should recieve null")
+      chai.assert.equal(isRoomExist, true, "The room code has not beed added to the dictionary");
+    });
+
+    test("Test validateJoinGame new game code", function() {
+      let users = {2211: {}};
+      let gameCode = 2211;
+      let gameCreator = "true";
+
+      let validateJoinGameResponse = gameLogic.validateJoinGame(gameCode, users, gameCreator);
+
+      let isRoomExist = (gameCode in users);
+
+      chai.assert.equal(validateJoinGameResponse[0], "new game code", "Should recieve new game code")
+      chai.assert.equal(validateJoinGameResponse[1].length, 4, "New game code should be 4 digits")
+      chai.assert.equal(isRoomExist, true, "The room code has not beed added to the dictionary");
+    });
+
+
+    test("Test validateJoinGame invalid game code", function() {
+      let users = {2211: {}};
+      let gameCode = 3311;
+      let gameCreator = "false";
+
+      let validateJoinGameResponse = gameLogic.validateJoinGame(gameCode, users, gameCreator);
+
+      chai.assert.equal(validateJoinGameResponse[0], "invalid game code", "Should recieve invalid game code")
     });
 
     test("Test setNickname", function() {
@@ -326,5 +352,6 @@ suite("Test test", function() {
       sortedScores = gameLogic.sortScores(scores);
 
       chai.assert(sortedScores, expected, "Scored not sorted correctly");
-    })
+    });
+
   });

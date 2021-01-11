@@ -56,9 +56,9 @@ io.on("connection", function(socket) {
 
         socket.join(gameCode);
         let socketId = socket.id;
-
+        
         //validate before allowing client to join room
-        let validateJoinGameResponse = gameLogic.validateJoinGame(gameCode, users, socketId, gameCreator);
+        let validateJoinGameResponse = gameLogic.validateJoinGame(gameCode, users, gameCreator);
         if (validateJoinGameResponse == null) {}
         else if (validateJoinGameResponse[0] == "new game code") {
             gameCode = validateJoinGameResponse[1];
@@ -73,7 +73,6 @@ io.on("connection", function(socket) {
 
         //add socket id and empty username (because it has not been set) to users dict
         users[gameCode]["users"][socketId] = "";
-        console.log(users)
 
         //If the user that just joined results in too many players joining the room, remove from users dict and return warning
         let numUsersInRoom = (Object.keys(users[gameCode]["users"])).length;

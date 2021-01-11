@@ -9,7 +9,7 @@ function generateNewGameCode(isRoomExist, users) {
     return gameCode;
 }
 
-function validateJoinGame(gameCode, users, socketId, gameCreator) {
+function validateJoinGame(gameCode, users, gameCreator) {
     //if the room is newly created add an empty dict as a value to the gameCode key
     let isRoomExist = (gameCode in users);
 
