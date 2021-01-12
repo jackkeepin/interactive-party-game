@@ -102,21 +102,20 @@ io.on("connection", function(socket) {
 
 
     //when client requests categories from the database
-    socket.on("get categories", function(data){
+    socket.on("get categories", async function(data){
         let gameCode = data;
 
-        Prompts.find().select("category -_id")
-            .then(function(response) {
-                let categories = []
-                response.forEach(element => {
-                    categories.push(element["category"]);
-                });
-                io.to(socket.id).emit("return categories", categories);
-            });
+        let categories = await promptsLogic.getAllCategories();
+        let categoriesArray = [];
+        categories.forEach(element => {
+            categoriesArray.push(element["category"]);
+        });
+
+        io.to(socket.id).emit("return categories", categoriesArray);
     });
 
-    //when client wants to start a game, validate the game options and send start game event
-    socket.on("validate game", function(data) {
+    //when game creator client wants to start a game, validate the game options and send start game event
+    socket.on("validate game", async function(data) {
         let gameCode = data[0];
         let category = data[1];
 
@@ -139,12 +138,10 @@ io.on("connection", function(socket) {
         //add scores to users dict ready for game as well as socket id's to VIP array
         gameLogic.readyDictForGame(users, gameCode, category);
 
-        Prompts.find({"category": category})
-            .then(function(response) {
-                users[gameCode]["prompts"] = response[0]["questions"];
-                io.to(gameCode).emit("start game");
-            });
+        let categoryPrompts = await promptsLogic.getCategoryPrompts(category);
 
+        users[gameCode]["prompts"] = categoryPrompts["questions"];
+        io.to(gameCode).emit("start game");
     });
 
 
@@ -246,17 +243,14 @@ io.on("connection", function(socket) {
     });
 
     //when client submits a new prompt set, save in the database
-    socket.on("create prompt set", function(data) {
+    socket.on("create prompt set", async function(data) {
         let cat = data[0];
         let promptInputs = data[1];
 
         let prompts = promptsLogic.createNewPrompt(cat, promptInputs);
+        await promptsLogic.putPromptsToDb(prompts);
 
-        prompts.save()
-        .then(function(result) {
-            io.to(socket.id).emit("prompt created")
-        })
-        
+        io.to(socket.id).emit("prompt created")
     });
 
 });

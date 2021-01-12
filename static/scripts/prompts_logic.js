@@ -9,13 +9,21 @@ function createNewPrompt(cat, promptsInput) {
     return prompts;
 }
 
-function putPromptsToDb(prompts) {
-    prompts.save()
-        .then(function(result) {
-            console.log(result);
-            return(result);
-        });
+async function getAllCategories() {
+    let categories = Prompts.find().select("category -_id");
+    return categories;
+}
+
+async function getCategoryPrompts(selectedCategory) {
+    let questions = await Prompts.findOne({category: selectedCategory});
+    return questions;
+}
+
+async function putPromptsToDb(promptInputs) {
+    await promptInputs.save();
 }
 
 module.exports.createNewPrompt = createNewPrompt;
+module.exports.getAllCategories = getAllCategories;
+module.exports.getCategoryPrompts = getCategoryPrompts;
 module.exports.putPromptsToDb = putPromptsToDb;
