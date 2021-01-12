@@ -39,7 +39,7 @@ suite("Test prompts_logic", function() {
   })
 
   /**
-   * Test createNewPrompt function.
+   * Test function to create prompt using model to store in database.
    */
   test("Test createNewPrompt", function() {
     let cat = "test category";
