@@ -156,7 +156,10 @@ io.on("connection", function(socket) {
         let promptToReturn = gameLogic.selectRandomPrompt(gameCode, users);
 
         if (promptToReturn == "_End Game Event_") {
-            io.to(gameCode).emit("end game", users[gameCode]["scores"]);
+            let usersInGame = users[gameCode]["users"]
+            let finalScores = users[gameCode]["scores"];
+            let sortedScores = gameLogic.sortScores(finalScores);
+            io.to(gameCode).emit("end game", [sortedScores, usersInGame]);
             return;
         }
 
