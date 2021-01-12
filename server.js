@@ -50,6 +50,7 @@ var maxPoints = 3;
 io.on("connection", function(socket) {
     socket.emit("confirm connection", "successfully connected - from server");
 
+    //when client sends join room event, validate options and allow socket to join room
     socket.on("join room", function(data) {
         let gameCode = data[0];
         let gameCreator = data[1];
@@ -88,6 +89,7 @@ io.on("connection", function(socket) {
     });
 
 
+    //when client sends request to set their nickname
     socket.on("set nickname", function(data) {
         let gameCode = data[0];
         let nickname = data[1];
@@ -99,6 +101,7 @@ io.on("connection", function(socket) {
     });
 
 
+    //when client requests categories from the database
     socket.on("get categories", function(data){
         let gameCode = data;
 
@@ -112,7 +115,7 @@ io.on("connection", function(socket) {
             });
     });
 
-
+    //when client wants to start a game, validate the game options and send start game event
     socket.on("validate game", function(data) {
         let gameCode = data[0];
         let category = data[1];
@@ -150,20 +153,18 @@ io.on("connection", function(socket) {
        let gameCode =  data;
  
         let vipSocketId = gameLogic.getVipSocketId(gameCode, users);
-
         let promptToReturn = gameLogic.selectRandomPrompt(gameCode, users);
 
         if (promptToReturn == "_End Game Event_") {
             io.to(gameCode).emit("end game", users[gameCode]["scores"]);
+            return;
         }
 
        io.to(gameCode).emit("return prompt", [promptToReturn, vipSocketId]);
-
     });
 
     //when answer received from client save it until all other clients have answered
     socket.on("submit answer", function(data) {
-
         let answer = data[0];
         let gameCode = data[1];
         let socketId = socket.id;
@@ -202,12 +203,14 @@ io.on("connection", function(socket) {
         let roundWinnerUsername = users[gameCode]["users"][winnerSocketId];
         let roundWinnerAnswer = users[gameCode]["submittedAnswers"][winnerSocketId];
 
+        //clear submited answers ready for next round
         users[gameCode]["submittedAnswers"] = {};
 
         io.to(gameCode).emit("winner of round", [roundWinnerUsername, roundWinnerAnswer])
     });
 
 
+    //when a client disconnects from the server, remove from room is users dict and return clients still connected
     socket.on("disconnecting", function(data) {
         //when a user disconnects from a game, remove from users dict
         let rooms = socket.rooms;
@@ -239,6 +242,7 @@ io.on("connection", function(socket) {
         }
     });
 
+    //when client submits a new prompt set, save in the database
     socket.on("create prompt set", function(data) {
         let cat = data[0];
         let promptInputs = data[1];
@@ -247,8 +251,6 @@ io.on("connection", function(socket) {
 
         prompts.save()
         .then(function(result) {
-            console.log(result);
-            // return(result);
             io.to(socket.id).emit("prompt created")
         })
         

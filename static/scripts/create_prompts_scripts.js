@@ -4,20 +4,16 @@ $(function() {
     let socket = io();
 
     $(document).on("click", ".addPromptButton", function() {
-        console.log("CLicked")
         let promptImp = $(this).prev("input").val();
         if (promptImp == "") {
             return;
         }
-        console.log(promptImp)
-        $("#newPromptDataBox").append("<div class='promptInputDiv'><input type='text' maxLength='100' class='promptInput' placeholder='Enter question' value='" + promptImp + " '><button class='removePromptButton'>-</button></div>")
+        $("#newPromptDataBox").append('<div class="promptInputDiv"><input type="text" maxLength="100" class="promptInput" placeholder="Enter question" value="' + promptImp + ' "><button class="removePromptButton">-</button></div>');
         $(this).prev("input").val("");
     });
 
     $(document).on("click", ".removePromptButton", function() {
-        console.log("CLicked remove")
-        let pls = $(this).closest(".promptInputDiv").remove();
-        console.log(pls);
+        $(this).closest(".promptInputDiv").remove();
     });
 
     $(document).on("click", "#submitPromptDataButton", function() {
@@ -36,7 +32,7 @@ $(function() {
         });
 
         if (inpPrompts.length == 0) {
-            alert("You haven't input any prompts!")
+            alert("You haven't entered any questions!")
             return;
         }
         
