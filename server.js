@@ -248,7 +248,11 @@ io.on("connection", function(socket) {
         let promptInputs = data[1];
 
         let prompts = promptsLogic.createNewPrompt(cat, promptInputs);
-        await promptsLogic.putPromptsToDb(prompts);
+        let response = await promptsLogic.putPromptsToDb(prompts);
+        if (response == "duplicate category error") {
+            io.to(socket.id).emit(response);
+            return;
+        }
 
         io.to(socket.id).emit("prompt created")
     });

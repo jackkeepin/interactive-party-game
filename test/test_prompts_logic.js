@@ -105,6 +105,20 @@ suite("Test prompts_logic", function() {
     chai.assert.equal(recievedPrompts[1], "Here's another question.", "Second prompt incorrect");
   });
 
+  /**
+   * Test putPromptsToDb by creating a prompt set with a duplicate category, then 
+   * trying to add it to the database.
+   */
+  test("Test putPromptsToDb duplicate category", async function() {
+    let cat = "Test category";
+    let promptInputs = ["here's a question", "Here's another question."];
+
+    let prompts = promptsLogic.createNewPrompt(cat, promptInputs);
+    let response = await promptsLogic.putPromptsToDb(prompts);
+
+    chai.assert.equal(response, "duplicate category error", "Should recieve duplicate category error");
+  });
+
 });
 
 
